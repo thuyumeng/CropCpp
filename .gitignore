@@ -1,0 +1,40 @@
+# Ignore binary files and intermediate files
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+.vscode/
+
+# Ignore Rider specific files
+.idea/
+*.sln
+*.csproj
+*.user
+*.suo
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+*.VC.db
+*.VC.VC.opendb
+
+# Ignore build files
+Build/
+
+# Ignore config files
+*.ini
+*.log
+*.vs/
+.vscode/
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/extensions.json
+
+# Ignore macOS specific files
+.DS_Store
+
+# Ignore Windows specific files
+Thumbs.db
