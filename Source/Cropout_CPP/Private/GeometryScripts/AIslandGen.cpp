@@ -2,11 +2,15 @@
 
 
 #include "AIslandGen.h"
+
 #include "GeometryScript/MeshPrimitiveFunctions.h"
 #include "GeometryScript/MeshVoxelFunctions.h"
 #include "GeometryScript//MeshNormalsFunctions.h"
 #include "GeometryScript//MeshDeformFunctions.h"
 #include "GeometryScript/MeshSubdivideFunctions.h"
+#include "GeometryScript//MeshBooleanFunctions.h"
+#include "GeometryScript/MeshUVFunctions.h"
+
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -29,6 +33,8 @@ void AAIslandGen::CreateIsland()
 	Mesh->Reset();
 	// create the island
 	this->CreateIslandBase();
+	// release all the compute mesh data
+	this->ReleaseAllComputeMeshes();
 }
 
 void AAIslandGen::SetSeed(int32 InputSeed)
@@ -145,6 +151,54 @@ void AAIslandGen::SolidifyAndSmooth(UDynamicMesh* Mesh)
 		Mesh, TessellateOptions, TessellationLevel);
 }
 
+void AAIslandGen::CutAndApplyUV(UDynamicMesh* Mesh)
+{
+	// delete the section of the mesh not needed anymore
+	FVector Translation(
+		0.0f,
+		0.0f,
+		-390.0f);
+	FRotator Rotation(
+		180.0f,  // 180 degrees to cut the bottom
+		0.0f,
+		0.0f);
+	FVector Scale(
+		1.0f,
+		1.0f,
+		1.0f);
+	FTransform CutFrame(Rotation, Translation, Scale);
+	FGeometryScriptMeshPlaneCutOptions CutBottomOptions;
+	CutBottomOptions.UVWorldDimension = 1.0f;
+	UGeometryScriptLibrary_MeshBooleanFunctions::ApplyMeshPlaneCut(
+		Mesh, CutFrame, CutBottomOptions);
+	// flatten the top and project uvs
+	Translation = FVector(
+		0.0f, // 0 degrees to cut the top
+		0.0f,
+		0.0f);
+	Rotation = FRotator(
+		0.0f,
+		0.0f,
+		0.0f);
+	Scale = FVector(
+		1.0f,
+		1.0f,
+		1.0f);
+	FTransform CutTopFrame(Rotation, Translation, Scale);
+	FGeometryScriptMeshPlaneCutOptions CutTopOptions;
+	UGeometryScriptLibrary_MeshBooleanFunctions::ApplyMeshPlaneCut(
+		Mesh, CutTopFrame, CutTopOptions);
+
+	// project the uvs
+	int UVChannel = 0;
+	Scale = FVector(100.0f, 100.0f, 100.0f);
+	FTransform PlaneTransform(Rotation, Translation, Scale);
+	FGeometryScriptMeshSelection UVSelection;
+	
+	UGeometryScriptLibrary_MeshUVFunctions::SetMeshUVsFromPlanarProjection(
+		Mesh, UVChannel, PlaneTransform, UVSelection);
+}
+
 void AAIslandGen::CreateIslandBase()
 {
 	UDynamicMesh* Mesh = this->GetDynamicMeshComponent()->GetDynamicMesh();
@@ -154,5 +208,7 @@ void AAIslandGen::CreateIslandBase()
 	GenerateBaseForIslands(Mesh);
 	// solidify, smooth and tessellate the mesh
 	SolidifyAndSmooth(Mesh);
-}
+	// cut the mesh and apply UVs
+	CutAndApplyUV(Mesh);
+}	
 

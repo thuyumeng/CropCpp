@@ -15,6 +15,7 @@ class CROPOUT_CPP_API AAIslandGen : public ADynamicMeshActor
 	// utility functions to generate the islands
 	static int PlatformSwitch(int32 LowLevelOption, int32 HighLevelOption);
 	static void SolidifyAndSmooth(UDynamicMesh* Mesh);
+	static void CutAndApplyUV(UDynamicMesh* Mesh);
 	void GenerateIslandCones(UDynamicMesh* Mesh);
 	void GenerateBaseForIslands(UDynamicMesh* Mesh) const;
 	
@@ -52,5 +53,4 @@ public:
 	// Function to set the seed of the random stream
 	UFUNCTION(BlueprintCallable, Category = "Island Generation")
 	void SetSeed(int32 InputSeed);
-	
 };
