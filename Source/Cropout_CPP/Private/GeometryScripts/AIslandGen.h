@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GeometryScript/MeshVoxelFunctions.h"
 #include "Runtime/GeometryFramework/Public/DynamicMeshActor.h"
 #include "AIslandGen.generated.h"
 
@@ -10,6 +11,13 @@ UCLASS()
 class CROPOUT_CPP_API AAIslandGen : public ADynamicMeshActor
 {
 	GENERATED_BODY()
+
+	// utility functions to generate the islands
+	static int PlatformSwitch(int32 LowLevelOption, int32 HighLevelOption);
+	static void SolidifyAndSmooth(UDynamicMesh* Mesh);
+	void GenerateIslandCones(UDynamicMesh* Mesh);
+	void GenerateBaseForIslands(UDynamicMesh* Mesh) const;
+	
 	// use a bunch of cylinders to create the basic shape of the island
 	void CreateIslandBase();
 protected:
@@ -30,18 +38,19 @@ public:
 	// FVector2D store the maximum and minimum size of the island
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Island Generation")
 	FVector2D IslandSize = FVector2D(500.0f, 8000.0f);
-	// the Radius of the cone island
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Island Generation")
-	float Radius = 1000.0f;
+	// the Seed of the random stream
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Island Generation")
+	int32 Seed = 0;
+	// the number of islands to generate
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Island Generation")
+	int32 Islands = 1;
 	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	// Create a new island blueprint callable function
 	UFUNCTION(BlueprintCallable, Category = "Island Generation")
 	void CreateIsland();
 	
 	// Function to set the seed of the random stream
 	UFUNCTION(BlueprintCallable, Category = "Island Generation")
-	void SetSeed(int32 Seed);
+	void SetSeed(int32 InputSeed);
+	
 };
