@@ -24,7 +24,6 @@ Saved/
 Build/
 
 # Ignore config files
-*.ini
 *.log
 *.vs/
 .vscode/
