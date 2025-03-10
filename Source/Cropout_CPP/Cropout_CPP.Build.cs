@@ -12,6 +12,7 @@ public class Cropout_CPP : ModuleRules
 		{
 			"Core", "CoreUObject", "Engine", 
 			"InputCore", "GeometryFramework", "GeometryScriptingCore",
+			"UMG"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
